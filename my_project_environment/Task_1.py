@@ -24,7 +24,8 @@ def primary_process(file_name, query_list):
 
     cursor = connection.cursor()
     for student in students_data:
-        cursor.execute(query_list[0], (student['birthday'], student['id'], student['name'], student['room'], student['sex']))
+        cursor.execute(query_list[0],
+                       (student['birthday'], student['id'], student['name'], student['room'], student['sex']))
 
     for room in rooms_data:
         cursor.execute(query_list[1], (re.findall(r'\b\d{1,3}\b', room['name'])[0],))
@@ -33,32 +34,46 @@ def primary_process(file_name, query_list):
     connection.close()
 
 
-def secondary_process(query_list):
+def prompt_1():
     connection = connect_to_db()
     cursor = connection.cursor()
-    cursor.execute(query_list[0])
-    cursor.execute(query_list[1])
-    cursor.execute(query_list[2])
-    cursor.execute(query_list[3])
-    student_results = cursor.fetchall()
-    cursor.execute(query_list[4])
+    cursor.execute(query_1)
     results = cursor.fetchall()
     for row in results:
-        print(f"Room Number: {row[1]}, Number of students: {row[2]}")
+        print(f"Room Number: {row[0]}, Number of students: {row[1]}")
+    connection.commit()
+    cursor.close()
+    connection.close()
 
-    cursor.execute(query_list[5])
-    cursor.execute(query_list[6])
-    cursor.execute(query_list[7])
+
+def prompt_2():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    cursor.execute(query_2)
     results = cursor.fetchall()
     for row in results:
-        print(f"Room ID: {row[0]}, Room Number: {row[1]}, Average age: {row[2]}")
+        print(f"Room Number: {row[0]}, Average age: {row[1]}")
+    connection.commit()
+    cursor.close()
+    connection.close()
 
-    cursor.execute(query_list[8])
+
+def prompt_3():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    cursor.execute(query_3)
     results = cursor.fetchall()
     for row in results:
         print(f"Room Number: {row[0]}, Age difference: {row[1]}")
+    connection.commit()
+    cursor.close()
+    connection.close()
 
-    cursor.execute(query_list[9])
+
+def prompt_4():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    cursor.execute(query_4)
     results = cursor.fetchall()
     print('Rooms with M and F gender:')
     for row in results:
@@ -68,7 +83,23 @@ def secondary_process(query_list):
     connection.close()
 
 
-primary_process(['students.json', 'rooms.json'], [query_0_1, query_0_2])
-secondary_process(
-    [query_1_1, query_1_2, query_1_3, query_1_4, query_1_5, query_2_1, query_2_2, query_2_3, query_3_1, query_4_1])
+def is_student_empty():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    cursor.execute(query_is_empty_student)
+    results = cursor.fetchall()
+    if results[0][0] == 0:
+        return False
+    else:
+        return True
 
+
+def is_room_empty():
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    cursor.execute(query_is_empty_room)
+    results = cursor.fetchall()
+    if results[0][0] == 0:
+        return False
+    else:
+        return True
